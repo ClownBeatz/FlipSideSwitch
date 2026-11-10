@@ -61,6 +61,24 @@ public class UIManager : MonoBehaviour
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
+
+        // Shared HUD look (timer cards, active indicator, prompts). See HUDStyler.cs
+        if (GetComponent<HUDStyler>() == null) gameObject.AddComponent<HUDStyler>();
+    }
+
+    // Read-only access for HUDStyler
+    public TextMeshProUGUI LevelLabel => levelLabel;
+    public Image FlashOverlay => flashOverlay;
+    public GameObject DividingLine => dividingLine;
+
+    private Color? dividingLineRestColour;
+
+    // Remember the resting colour once so quick repeated switches never leave the line faded
+    public void CacheDividingLineColour()
+    {
+        if (dividingLine == null) return;
+        Image img = dividingLine.GetComponent<Image>();
+        if (img != null) dividingLineRestColour = img.color;
     }
 
     private void Start()
@@ -284,7 +302,7 @@ public class UIManager : MonoBehaviour
         if (dividingLine == null) yield break;
 
         Image lineImg = dividingLine.GetComponent<Image>();
-        Color restColour = lineImg != null ? lineImg.color : Color.white;
+        Color restColour = dividingLineRestColour ?? (lineImg != null ? lineImg.color : Color.white);
 
         Color[] blinks =
         {

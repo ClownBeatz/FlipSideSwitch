@@ -74,9 +74,9 @@ public class TutorialManager : MonoBehaviour
     [SerializeField] private float exitProximity = 4f;    // Tiles from exit to trigger Tab hint
 
     [Header("Colours")]
-    [SerializeField] private Color arcColour = new Color(0.85f, 0.95f, 1.00f); // Cool white-blue
-    [SerializeField] private Color echoColour = new Color(0.75f, 0.45f, 1.00f); // Neon purple
-    [SerializeField] private Color keyColour = new Color(1.00f, 0.90f, 0.40f); // Warm yellow for key labels
+    [SerializeField] private Color arcColour = new Color(0.56f, 0.83f, 1.00f); // Ice blue (theme)
+    [SerializeField] private Color echoColour = new Color(0.88f, 0.49f, 1.00f); // Neon purple (theme)
+    [SerializeField] private Color keyColour = new Color(1.00f, 0.83f, 0.42f); // Gold for key labels (theme)
 
     // ------------------------------------------------------------------
     // State machine
@@ -113,13 +113,13 @@ public class TutorialManager : MonoBehaviour
         yield return new WaitForSeconds(0.8f);
         yield return ShowPrompt(
             $"<color=#{ColorToHex(arcColour)}>YOU ARE ARC</color>",
-            "Navigate the light. Guide Echo through the dark.",
+            "Navigate the light. Guide ECHO through the dark.",
             3.2f);
 
         // ── Step 1: Move ────────────────────────────────────────────────
         yield return new WaitForSeconds(0.5f);
         yield return ShowPrompt(
-            $"<color=#{ColorToHex(keyColour)}>[A] [D]</color>  or  <color=#{ColorToHex(keyColour)}>[← →]</color>",
+            $"<color=#{ColorToHex(keyColour)}>A  D</color>   or   <color=#{ColorToHex(keyColour)}>LEFT  RIGHT</color>",
             "Move left and right.",
             2.5f);
 
@@ -129,7 +129,7 @@ public class TutorialManager : MonoBehaviour
         yield return new WaitUntil(() => hasMoved);
         yield return new WaitForSeconds(0.4f);
         yield return ShowPrompt(
-            $"<color=#{ColorToHex(keyColour)}>[SPACE]</color>",
+            $"<color=#{ColorToHex(keyColour)}>SPACE</color>",
             "Jump.",
             2.2f);
 
@@ -141,7 +141,7 @@ public class TutorialManager : MonoBehaviour
 
         yield return new WaitForSeconds(0.2f);
         yield return ShowPrompt(
-            $"<color=#{ColorToHex(keyColour)}>[TAB]</color>  —  SWITCH",
+            $"<color=#{ColorToHex(keyColour)}>TAB</color>   SWITCH",
             "ARC and ECHO each control one half.\nSwitch between them to guide both home.",
             4.0f);
 
@@ -246,6 +246,11 @@ public class TutorialManager : MonoBehaviour
     // ------------------------------------------------------------------
     // Helper — converts Color to hex string for TMP rich text
     // ------------------------------------------------------------------
+    // Read-only access for HUDStyler
+    public GameObject TutorialPanel => tutorialPanel;
+    public TextMeshProUGUI MainText => mainText;
+    public TextMeshProUGUI SubText => subText;
+
     private string ColorToHex(Color colour)
     {
         return ColorUtility.ToHtmlStringRGB(colour);

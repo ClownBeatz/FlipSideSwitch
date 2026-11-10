@@ -32,6 +32,7 @@
 // crawl. Audio pitch is also adjusted down to match the slow-motion feel.
 
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -78,6 +79,10 @@ public class PauseManager : MonoBehaviour
 
     private void Start()
     {
+        // Match the FLIPSIDE look (see PanelStyler.cs). Visual only.
+        PanelStyler.StylePause(pausePanel, pauseTitleText, pauseSubText,
+            resumeButton, restartButton, menuButton, quitButton);
+
         // Wire buttons
         if (resumeButton != null) resumeButton.onClick.AddListener(Resume);
         if (restartButton != null) restartButton.onClick.AddListener(RestartLevel);
@@ -101,6 +106,7 @@ public class PauseManager : MonoBehaviour
     {
         if (value.isPressed)
         {
+            if (SceneFader.IsFading) return; // already leaving the level
             if (isPaused) Resume();
             else Pause();
         }
@@ -126,6 +132,10 @@ public class PauseManager : MonoBehaviour
 
         if (fadeCoroutine != null) StopCoroutine(fadeCoroutine);
         fadeCoroutine = StartCoroutine(FadePanel(0f, 1f, panelFadeDuration));
+
+        // Keyboard navigation starts on Resume
+        if (resumeButton != null && EventSystem.current != null)
+            EventSystem.current.SetSelectedGameObject(resumeButton.gameObject);
     }
 
     // ------------------------------------------------------------------
@@ -137,6 +147,7 @@ public class PauseManager : MonoBehaviour
         isPaused = false;
 
         SetButtonsInteractable(false);
+        if (EventSystem.current != null) EventSystem.current.SetSelectedGameObject(null);
 
         // Fade panel out
         if (fadeCoroutine != null) StopCoroutine(fadeCoroutine);
@@ -160,16 +171,25 @@ public class PauseManager : MonoBehaviour
     // ------------------------------------------------------------------
     public void RestartLevel()
     {
-        ResetTimeScale();
-        SetAllAudioPitch(1f);
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        FreezeForSceneChange();
+        SceneFader.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     public void GoToMenu()
     {
-        ResetTimeScale();
+        FreezeForSceneChange();
+        SceneFader.LoadScene(0);
+    }
+
+    // Holds the world still during the short fade to black.
+    // SceneFader sets the time scale back to 1 right before the new scene loads.
+    private void FreezeForSceneChange()
+    {
+        if (resumeCoroutine != null) StopCoroutine(resumeCoroutine);
+        isPaused = false;
+        Time.timeScale = 0f;
         SetAllAudioPitch(1f);
-        SceneManager.LoadScene(0);
+        SetButtonsInteractable(false);
     }
 
     public void QuitGame()

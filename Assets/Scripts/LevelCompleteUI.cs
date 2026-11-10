@@ -29,6 +29,7 @@
 // 6. In LevelManager, drag LevelCompletePanel into "Level Complete Panel" slot
 
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
@@ -68,10 +69,23 @@ public class LevelCompleteUI : MonoBehaviour
     private RectTransform rectTransform;
     private Vector2 shownPosition;
     private Vector2 hiddenPosition;
+    private PanelStyler.LevelCompleteParts styled;
+    private Button menuButton;
+
+    public const string CompletedKeyPrefix = "Flipside_Completed_";
 
     private void Awake()
     {
         rectTransform = GetComponent<RectTransform>();
+
+        // Match the FLIPSIDE look (see PanelStyler.cs). Visual only.
+        int index = SceneManager.GetActiveScene().buildIndex;
+        bool isLastLevel = index >= SceneManager.sceneCountInBuildSettings - 1;
+        styled = PanelStyler.StyleLevelComplete(rectTransform, headerText, subText, nextButton, retryButton, isLastLevel);
+        if (canvasGroup == null) canvasGroup = GetComponent<CanvasGroup>();
+        menuButton = styled.menuButton;
+        if (menuButton != null) menuButton.onClick.AddListener(OnMenuPressed);
+
         shownPosition = rectTransform.anchoredPosition;
         hiddenPosition = shownPosition + new Vector2(0f, Screen.height + 100f);
 
@@ -88,6 +102,22 @@ public class LevelCompleteUI : MonoBehaviour
 
         if (subText != null)
             subText.text = CompletionLines[Random.Range(0, CompletionLines.Length)];
+
+        string sceneName = SceneManager.GetActiveScene().name;
+        if (styled != null)
+        {
+            if (styled.eyebrow != null) styled.eyebrow.text = sceneName.Replace("_", " ").ToUpperInvariant();
+            if (LevelTimer.Instance != null)
+            {
+                if (styled.arcTime != null) styled.arcTime.text = PanelStyler.FormatTime(LevelTimer.Instance.GetARCTimeRemaining());
+                if (styled.echoTime != null) styled.echoTime.text = PanelStyler.FormatTime(LevelTimer.Instance.GetECHOTimeRemaining());
+            }
+            if (styled.backdrop != null) StartCoroutine(FadeBackdrop(styled.backdrop, 0.65f, 0.4f));
+        }
+
+        // Remember progress for the level select screen
+        PlayerPrefs.SetInt(CompletedKeyPrefix + sceneName, 1);
+        PlayerPrefs.Save();
 
         if (UIManager.Instance != null)
             UIManager.Instance.FlashLevelComplete();
@@ -134,6 +164,26 @@ public class LevelCompleteUI : MonoBehaviour
         // ── 3. Buttons fade in ───────────────────────────────────────────
         yield return new WaitForSeconds(buttonsFadeDelay - headerPopDelay);
         yield return StartCoroutine(FadeInButtons(buttonsFadeDur));
+
+        // Keyboard navigation starts on the main action
+        if (nextButton != null && EventSystem.current != null)
+            EventSystem.current.SetSelectedGameObject(nextButton.gameObject);
+    }
+
+    private IEnumerator FadeBackdrop(Image backdrop, float targetAlpha, float duration)
+    {
+        backdrop.gameObject.SetActive(true);
+        Color c = backdrop.color;
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            c.a = Mathf.Lerp(0f, targetAlpha, elapsed / duration);
+            backdrop.color = c;
+            yield return null;
+        }
+        c.a = targetAlpha;
+        backdrop.color = c;
     }
 
     private IEnumerator PopScale(Transform t, float duration)
@@ -180,6 +230,8 @@ public class LevelCompleteUI : MonoBehaviour
     {
         SetGraphicAlpha(nextButton?.GetComponent<CanvasGroup>(), a);
         SetGraphicAlpha(retryButton?.GetComponent<CanvasGroup>(), a);
+        SetGraphicAlpha(menuButton?.GetComponent<CanvasGroup>(), a);
+        if (menuButton != null) menuButton.interactable = a >= 0.99f;
         // Fallback: if buttons don't have CanvasGroups just show them
         if (nextButton != null) nextButton.interactable = a >= 0.99f;
         if (retryButton != null) retryButton.interactable = a >= 0.99f;
@@ -196,12 +248,17 @@ public class LevelCompleteUI : MonoBehaviour
     private void OnNextPressed()
     {
         int next = SceneManager.GetActiveScene().buildIndex + 1;
-        SceneManager.LoadScene(next < SceneManager.sceneCountInBuildSettings ? next : 0);
+        SceneFader.LoadScene(next < SceneManager.sceneCountInBuildSettings ? next : 0);
     }
 
     private void OnRetryPressed()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        SceneFader.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    private void OnMenuPressed()
+    {
+        SceneFader.LoadScene(0);
     }
 
     // ------------------------------------------------------------------ //

@@ -208,7 +208,8 @@ public class LevelTimer : MonoBehaviour
         int s = Mathf.FloorToInt(seconds % 60f);
         int cs = Mathf.FloorToInt((seconds * 100f) % 100f);
 
-        label.text = $"{m}:{s:00}.{cs:00}";
+        // Monospaced digits so the timer does not jitter as it counts down
+        label.text = $"<mspace=0.56em>{m}:{s:00}.{cs:00}</mspace>";
     }
 
     private void SetIconVisible(Image icon, bool visible)
@@ -270,6 +271,12 @@ public class LevelTimer : MonoBehaviour
         SetIconVisible(arcFrostIcon, false);
         SetIconVisible(echoFrostIcon, false);
     }
+
+    // Read-only access for HUDStyler and the level complete screen
+    public TextMeshProUGUI ArcTimerText => arcTimerText;
+    public TextMeshProUGUI EchoTimerText => echoTimerText;
+    public Image ArcFrostIcon => arcFrostIcon;
+    public Image EchoFrostIcon => echoFrostIcon;
 
     public float GetARCTimeRemaining() => arcTimeRemaining;
     public float GetECHOTimeRemaining() => echoTimeRemaining;
