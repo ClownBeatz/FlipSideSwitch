@@ -1,4 +1,4 @@
-// FlipsideTheme.cs
+﻿// FlipsideTheme.cs
 // Shared visual identity for every FLIPSIDE screen: palette, fonts, generated
 // sprites and small UI builder helpers. Everything is created at runtime, so no
 // scene or prefab edits are needed.
@@ -363,7 +363,7 @@ public static class FlipsideTheme
     /// Dark glass card with a brand gradient strip on top.
     public static RectTransform CreateCard(string name, Transform parent, Vector2 size)
     {
-        Image bg = CreateImage(name, parent, Rounded, WithAlpha(Ink, 0.94f), true);
+        Image bg = CreateImage(name, parent, Rounded, Ink, true);
         RectTransform card = bg.rectTransform;
         Place(card, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, size);
         DecorateCard(card);

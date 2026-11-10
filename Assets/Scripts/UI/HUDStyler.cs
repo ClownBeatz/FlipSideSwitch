@@ -1,4 +1,4 @@
-// HUDStyler.cs
+﻿// HUDStyler.cs
 // Restyles the in-game HUD at runtime so every level shares one look.
 // Added automatically by UIManager, nothing to set up in the scene.
 //
@@ -102,7 +102,7 @@ public class HUDStyler : MonoBehaviour
         RectTransform a = FlipsideTheme.Stretch(iceGlow.rectTransform);
         a.offsetMin = new Vector2(0f, 30f); a.offsetMax = new Vector2(0f, 14f);
 
-        Image neonGlow = FlipsideTheme.CreateImage("NeonGlow", line, FlipsideTheme.VerticalFade, FlipsideTheme.WithAlpha(FlipsideTheme.EchoNeon, 0.65f));
+        Image neonGlow = FlipsideTheme.CreateImage("NeonGlow", line, FlipsideTheme.VerticalFade, FlipsideTheme.WithAlpha(FlipsideTheme.EchoNeon, 0.4f));
         RectTransform b = FlipsideTheme.Stretch(neonGlow.rectTransform);
         b.offsetMin = new Vector2(0f, -14f); b.offsetMax = new Vector2(0f, -30f);
 
@@ -276,6 +276,15 @@ public class HUDStyler : MonoBehaviour
         t.SetParent(hudRoot, false);
         FlipsideTheme.Place((RectTransform)t, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-28f, -28f), new Vector2(60f, 60f));
         FlipsideButton.Restyle(btn, FlipsideButton.Variant.Icon, "II").HudMode();
+
+        // Wire it in code so it works in every level (only Level 01 had it set up in the scene)
+        for (int i = 0; i < btn.onClick.GetPersistentEventCount(); i++)
+            btn.onClick.SetPersistentListenerState(i, UnityEngine.Events.UnityEventCallState.Off);
+        btn.onClick.AddListener(() =>
+        {
+            PauseManager pm = PauseManager.Instance != null ? PauseManager.Instance : FindFirstObjectByType<PauseManager>();
+            if (pm != null) pm.TogglePause();
+        });
     }
 
     // ------------------------------------------------------------------ //
@@ -315,6 +324,10 @@ public class HUDStyler : MonoBehaviour
         if (panel == null) return;
 
         FlipsideTheme.Place(panel, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 104f), new Vector2(1040f, 150f));
+
+        // Keep it above the HUD but behind the pause and level complete screens
+        if (panel.parent == hudRoot.parent)
+            panel.SetSiblingIndex(hudRoot.GetSiblingIndex() + 1);
         Image img = panel.GetComponent<Image>();
         if (img != null)
         {

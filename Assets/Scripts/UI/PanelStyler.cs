@@ -78,7 +78,6 @@ public static class PanelStyler
         h.childForceExpandWidth = false;
         h.childForceExpandHeight = false;
         FlipsideTheme.CreatePrompt(footer, new[] { "ESC" }, "Resume", FlipsideTheme.TextMuted);
-        FlipsideTheme.CreatePrompt(footer, new[] { "TAB" }, "Switch", FlipsideTheme.TextMuted);
     }
 
     private static void AddToStack(RectTransform stack, Button btn, FlipsideButton.Variant variant, string label)

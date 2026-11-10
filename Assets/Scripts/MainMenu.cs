@@ -165,18 +165,18 @@ public class MainMenu : MonoBehaviour
         {
             Image a = FlipsideTheme.CreateImage("ARC", topHalf, arcIdle, Color.white);
             a.preserveAspect = true;
-            arcChar = FlipsideTheme.Place(a.rectTransform, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(-600f, -6f), new Vector2(170f, 252f));
+            arcChar = FlipsideTheme.Place(a.rectTransform, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(-720f, -6f), new Vector2(170f, 252f));
         }
         Sprite echoIdle = FlipsideTheme.LoadSprite("EchoIdle", true);
         if (echoIdle != null)
         {
             Image e = FlipsideTheme.CreateImage("ECHO", bottomHalf, echoIdle, Color.white);
             e.preserveAspect = true;
-            echoChar = FlipsideTheme.Place(e.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 0f), new Vector2(600f, 6f), new Vector2(170f, 252f));
+            echoChar = FlipsideTheme.Place(e.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 0f), new Vector2(720f, 6f), new Vector2(170f, 252f));
             echoChar.localScale = new Vector3(1f, -1f, 1f);
 
             Image glow = FlipsideTheme.CreateImage("EchoGlow", bottomHalf, FlipsideTheme.Glow, FlipsideTheme.WithAlpha(FlipsideTheme.EchoNeon, 0.25f));
-            FlipsideTheme.Place(glow.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 0.5f), new Vector2(600f, -130f), new Vector2(360f, 360f));
+            FlipsideTheme.Place(glow.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 0.5f), new Vector2(720f, -130f), new Vector2(360f, 360f));
             glow.transform.SetSiblingIndex(e.transform.GetSiblingIndex());
         }
 
@@ -187,7 +187,7 @@ public class MainMenu : MonoBehaviour
 
         Image ice = FlipsideTheme.CreateImage("IceGlow", splitLine, FlipsideTheme.VerticalFade, FlipsideTheme.WithAlpha(FlipsideTheme.ArcBlue, 0.6f));
         RectTransform ir = FlipsideTheme.Stretch(ice.rectTransform); ir.offsetMin = new Vector2(0f, 35f); ir.offsetMax = new Vector2(0f, 18f);
-        Image neon = FlipsideTheme.CreateImage("NeonGlow", splitLine, FlipsideTheme.VerticalFade, FlipsideTheme.WithAlpha(FlipsideTheme.EchoNeon, 0.85f));
+        Image neon = FlipsideTheme.CreateImage("NeonGlow", splitLine, FlipsideTheme.VerticalFade, FlipsideTheme.WithAlpha(FlipsideTheme.EchoNeon, 0.45f));
         RectTransform nr = FlipsideTheme.Stretch(neon.rectTransform); nr.offsetMin = new Vector2(0f, -18f); nr.offsetMax = new Vector2(0f, -35f);
         Image core = FlipsideTheme.CreateImage("Core", splitLine, null, Color.white);
         core.rectTransform.anchorMin = new Vector2(0f, 0.5f); core.rectTransform.anchorMax = new Vector2(1f, 0.5f);
@@ -227,7 +227,7 @@ public class MainMenu : MonoBehaviour
 
         TextMeshProUGUI bottom = FlipsideTheme.CreateText("TitleBottom", bottomHalf, "FLIPSIDE", FlipsideTheme.TextRole.Title, FlipsideTheme.Hex("D9A8FF"), TextAlignmentOptions.Midline);
         titleBottom = FlipsideTheme.Place(bottom.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(1600f, 260f));
-        FlipsideTheme.AddGlow(bottom, FlipsideTheme.WithAlpha(FlipsideTheme.EchoNeon, 0.9f), 0.8f, 0.35f);
+        FlipsideTheme.AddGlow(bottom, FlipsideTheme.WithAlpha(FlipsideTheme.EchoNeon, 0.9f), 0.75f, 0.18f);
         titleGlowMat = bottom.fontSharedMaterial;
 
         // Tagline in ARC's world
@@ -355,8 +355,8 @@ public class MainMenu : MonoBehaviour
         var v = rows.gameObject.AddComponent<VerticalLayoutGroup>();
         v.spacing = 16f;
         v.childAlignment = TextAnchor.UpperLeft;
-        v.childControlWidth = false;
-        v.childControlHeight = false;
+        v.childControlWidth = true;
+        v.childControlHeight = true;
         v.childForceExpandWidth = false;
         v.childForceExpandHeight = false;
 
@@ -480,8 +480,8 @@ public class MainMenu : MonoBehaviour
         if (introDone)
         {
             float bob = (Mathf.Sin(time * 1.6f) * 0.5f + 0.5f) * 8f;
-            if (arcChar != null) arcChar.anchoredPosition = new Vector2(-600f, -6f + bob);
-            if (echoChar != null) echoChar.anchoredPosition = new Vector2(600f, 6f - bob);
+            if (arcChar != null) arcChar.anchoredPosition = new Vector2(-720f, -6f + bob);
+            if (echoChar != null) echoChar.anchoredPosition = new Vector2(720f, 6f - bob);
 
             // Occasional glitch: the two halves slip apart for a moment
             if (time > nextGlitch)

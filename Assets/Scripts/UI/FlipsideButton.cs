@@ -1,4 +1,4 @@
-// FlipsideButton.cs
+﻿// FlipsideButton.cs
 // Styled button with hover, press and keyboard selection states.
 // Works while the game is paused (all animation uses unscaled time).
 //

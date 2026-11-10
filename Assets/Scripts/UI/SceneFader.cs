@@ -22,6 +22,7 @@ public class SceneFader : MonoBehaviour
     private Coroutine routine;
     private bool loadingViaFader;
     private string lastSceneName;
+    private bool gotSceneEvent;
 
     private const float FadeOutTime = 0.35f;
     private const float FadeInTime = 0.55f;
@@ -57,6 +58,17 @@ public class SceneFader : MonoBehaviour
         BuildOverlay();
         SetAlpha(1f); // first scene fades in from black
         SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void Start()
+    {
+        // The first scene may already be loaded before this object subscribed,
+        // so make sure it always fades in.
+        if (!gotSceneEvent)
+        {
+            lastSceneName = SceneManager.GetActiveScene().name;
+            routine = StartCoroutine(FadeInRoutine(1f, FadeInTime));
+        }
     }
 
     private void OnDestroy()
@@ -118,6 +130,7 @@ public class SceneFader : MonoBehaviour
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         if (mode != LoadSceneMode.Single) return;
+        gotSceneEvent = true;
 
         bool sameScene = scene.name == lastSceneName;
         bool fromFader = loadingViaFader;

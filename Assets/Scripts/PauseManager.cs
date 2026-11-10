@@ -104,12 +104,24 @@ public class PauseManager : MonoBehaviour
     // ------------------------------------------------------------------
     public void OnPause(InputValue value)
     {
-        if (value.isPressed)
-        {
-            if (SceneFader.IsFading) return; // already leaving the level
-            if (isPaused) Resume();
-            else Pause();
-        }
+        if (value.isPressed) HandlePauseKey();
+    }
+
+    // ESC is also read directly here. The PlayerInput on ARC uses Broadcast Messages,
+    // which only reach ARC's own GameObject, so OnPause above never fired.
+    private int lastPauseKeyFrame = -1;
+
+    private void Update()
+    {
+        if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
+            HandlePauseKey();
+    }
+
+    private void HandlePauseKey()
+    {
+        if (lastPauseKeyFrame == Time.frameCount) return; // never toggle twice in one frame
+        lastPauseKeyFrame = Time.frameCount;
+        TogglePause();
     }
 
     // ------------------------------------------------------------------
@@ -272,9 +284,11 @@ public class PauseManager : MonoBehaviour
     private float EaseOut(float t) => 1f - (1f - Mathf.Clamp01(t)) * (1f - Mathf.Clamp01(t));
 
     public bool IsPaused() => isPaused;
+    public GameObject PausePanel => pausePanel;
 
     public void TogglePause()
     {
+        if (SceneFader.IsFading) return; // already leaving the level
         if (isPaused) Resume();
         else Pause();
     }

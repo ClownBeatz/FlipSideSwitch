@@ -78,13 +78,21 @@ public class LevelCompleteUI : MonoBehaviour
     {
         rectTransform = GetComponent<RectTransform>();
 
-        // Match the FLIPSIDE look (see PanelStyler.cs). Visual only.
-        int index = SceneManager.GetActiveScene().buildIndex;
-        bool isLastLevel = index >= SceneManager.sceneCountInBuildSettings - 1;
-        styled = PanelStyler.StyleLevelComplete(rectTransform, headerText, subText, nextButton, retryButton, isLastLevel);
-        if (canvasGroup == null) canvasGroup = GetComponent<CanvasGroup>();
-        menuButton = styled.menuButton;
-        if (menuButton != null) menuButton.onClick.AddListener(OnMenuPressed);
+        // The level scenes also have a copy of this component on the PausePanel.
+        // That copy must not restyle the pause screen, so only style the real panel.
+        bool onPausePanel = (PauseManager.Instance != null && PauseManager.Instance.PausePanel == gameObject)
+                            || gameObject.name.Contains("Pause");
+
+        if (!onPausePanel)
+        {
+            // Match the FLIPSIDE look (see PanelStyler.cs). Visual only.
+            int index = SceneManager.GetActiveScene().buildIndex;
+            bool isLastLevel = index >= SceneManager.sceneCountInBuildSettings - 1;
+            styled = PanelStyler.StyleLevelComplete(rectTransform, headerText, subText, nextButton, retryButton, isLastLevel);
+            if (canvasGroup == null) canvasGroup = GetComponent<CanvasGroup>();
+            menuButton = styled.menuButton;
+            if (menuButton != null) menuButton.onClick.AddListener(OnMenuPressed);
+        }
 
         shownPosition = rectTransform.anchoredPosition;
         hiddenPosition = shownPosition + new Vector2(0f, Screen.height + 100f);
